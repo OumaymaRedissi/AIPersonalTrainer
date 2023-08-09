@@ -1,0 +1,9 @@
+streamlit
+opencv-python
+tensorflow
+numpy
+langchain
+tensorflow_addons
+streamlit_webrtc
+openai
+python-dotenv
