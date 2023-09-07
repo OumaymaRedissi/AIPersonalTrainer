@@ -15,45 +15,19 @@ LSTM_PATH = ('inference_models/LSTM_model___Date_Time_2023_07_14__11_23_24___Los
 
 def show_about_project_ui():
     st.markdown('# About AI-FitTrainer')
-    st.write('Welcome to AI-FitTrainer, your personal AI assistant for analyzing squats!')
-    st.write(
-        'AI-FitTrainer is an innovative AI-powered solution designed to help you improve your squat technique and '
-        'achieve your fitness goals. Whether you are a beginner or an experienced fitness enthusiast, AI-FitTrainer '
-        'offers personalized guidance and feedback to enhance your training experience.')
+
+    st.write('Welcome to AI-FitTrainer, your innovative AI-powered solution designed to help you improve your squat '
+             'technique and achieve your fitness goals.')
     st.write('With AI-FitTrainer, you can:')
-    st.write(
-        '- Upload recorded videos: Upload videos of your squat performances, and AI-FitTrainer will analyze them to '
-        'evaluate your squat technique.')
-    st.write(
-        '- Get comprehensive feedback: AI-FitTrainer utilizes state-of-the-art computer vision algorithms to assess '
-        'your squat technique accurately. It identifies common mistakes and provides detailed feedback on how to '
-        'correct them.')
-    st.write(
-        '- Access personalized instructions: AI-FitTrainer generates contextually relevant and informative text-based '
-        'instructions to guide you in improving your squat technique.')
-    st.write(
-        '- Enjoy convenience and flexibility: AI-FitTrainer is accessible anytime, anywhere, allowing you to train at '
-        'your convenience without the need for a personal trainer or gym membership.')
-    st.write(
-        'Whether you are looking to master the basics of squats or refine your form, AI-FitTrainer is here to support '
-        'you throughout your fitness journey. Start using AI-FitTrainer today and unlock the full potential of your '
-        'squat training!')
+    _,col,_= st.columns([0.15, 0.7, 0.15])
+    with col:
+        st.image("img/features.png",use_column_width=True)
+
+    st.write('Whether you are looking to master the basics of squats or refine your form, AI-FitTrainer is here to '
+             'support you throughout your fitness journey.')
 
 
-def show_realtime_assistance_ui():
-    st.header("Real-time Video Analysis")
-    st.header("Real-time Video Analysis")
-    st.markdown('This mode enables real-time video analysis of your squat technique using your webcam.')
-    st.markdown('Click on the "Start" button below to use your webcam and receive live feedback on your squat form.')
-    st.write(
-        'Once you start the webcam, perform squats in front of it, and the AI trainer will provide feedback in '
-        'real-time.')
-    st.write('Please make sure your full body is visible in the webcam feed for accurate analysis.')
-
-    # Start the webcam and perform real-time video analysis
-
-
-def show_upload_ui():
+def show_assist_squat_ui():
     lstm_model = load_lstm_model(LSTM_PATH)
     feature_extraction_model = load_features_extractor(IMG_SIZE)
     llm_model = load_llm()
@@ -61,78 +35,104 @@ def show_upload_ui():
     predicted_label = ""
     trainer_feedback = ""
 
-    st.header("Upload Video")
-    st.markdown('In this mode, you can upload a recorded video of your squat performance for analysis and feedback.')
-    st.markdown('To get started, click on the "Choose a video..." button and select the video file from your device.')
     st.markdown(
-        'Once the video is uploaded, you can click the "Classify The Video" button to analyze the squat technique and '
-        'view the results.')
-    col1, col2 = st.columns([0.5, 0.5])  # Increase the width of the first column
+        """
+        <style>
+            /* Update text color and font */
+            .title-text {
+                color: #4CAF50; /* Green color */
+                font-family: "Helvetica Neue", sans-serif;
+            }
+            .subheader-text {
+                color: #333; /* Dark gray color */
+                font-family: "Arial", sans-serif;
+            }
+            .feedback-text {
+                color: #E57373; /* Red color */
+                font-family: "Verdana", sans-serif;
+            }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    st.markdown('# Assist My Squat ! ',)
+    st.markdown(
+        '<p class="subheader-text">Ready to improve your squat technique? Upload a video of your squat performance '
+        'and get personalized feedback.</p>',
+        unsafe_allow_html=True)
+
+    # Upload video section
+    st.subheader("Upload Your Video")
+    st.write('Select a video file from your device to begin.')
+    col1, col2 = st.columns([0.5, 0.5])
+    activate_col2 = False
 
     with col1:
-        # Upload video file
         uploaded_file = st.file_uploader("Choose a video...", type=["mp4", "mpeg"])
 
         if uploaded_file is not None:
-            # Store the uploaded video locally
             video_path = os.path.join("C:/Users/redis/Documents/tempDir", uploaded_file.name.split("/")[-1])
             with open(video_path, "wb") as f:
                 f.write(uploaded_file.getbuffer())
             st.success("File Uploaded Successfully")
 
+        if uploaded_file is not None:
+            # Processing and feedback generation
+            st.subheader("Analyze Your Squat")
+            st.write("Once uploaded, we'll analyze your squat technique and provide feedback.")
 
             progress_bar = st.progress(0)
 
-            # Sample frames from the uploaded video
             frames = frame_generator(video_path, IMG_SIZE)
 
             if frames:
-                # Update progress bar
                 progress_bar.progress(25)
 
-                # Extract features from the sampled frames
                 features = extract_features(frames, feature_extraction_model, SEQUENCE_LENGTH)
                 progress_bar.progress(50)
                 if len(features) > 0:
-                    # Update progress bar
-
-
-                    # Classify the features using LSTM model
                     progress_bar.progress(75)
 
                     predicted_class = np.argmax(lstm_model.predict(np.expand_dims(features, axis=0)), axis=1)[0]
                     predicted_label = CLASSES_LIST[predicted_class]
-                    trainer_feedback = feedback_generator(predicted_label,llm_model)
+                    trainer_feedback = feedback_generator(predicted_label, llm_model)
                     progress_bar.progress(100)
-    with col2:
+                    activate_col2 = True
 
-        # Provide feedback and suggestions based on the predicted class label
-        st.markdown('## Feedback and Suggestions:')
-        st.write("##### Predicted Squat Technique: ", predicted_label)
-        st.write(trainer_feedback)
+    with col2:
+        if activate_col2:
+            # Display feedback and suggestions
+            st.subheader("Feedback and Suggestions")
+            st.write("Here's the analysis of your squat technique:")
+            st.markdown(
+                '<p class="subheader-text">Predicted Squat Technique: <span class="feedback-text">{}</span></p>'.format(
+                    predicted_label), unsafe_allow_html=True)
+            st.markdown('<p class="subheader-text">Trainer Feedback:</p>', unsafe_allow_html=True)
+            st.markdown('<p class="feedback-text">{}</p>'.format(trainer_feedback), unsafe_allow_html=True)
 
 
 def main():
     st.set_page_config(
         page_title="AI-FitTrainer",
-        page_icon="img/aifittrainer.jpg",
+        page_icon="img/aifittrainer.png",
         layout="wide",
-        initial_sidebar_state="auto"
+        initial_sidebar_state='auto'
     )
 
-    st.sidebar.image("img/ai-fit-trainer.png", width=300)
+    st.sidebar.image("img/ai-fit-trainer.png", use_column_width=True)
     st.sidebar.title('AI-FitTrainer')
     st.sidebar.subheader('Deep Learning-based Personal Fitness Assistant')
-
-    app_mode = st.sidebar.selectbox('Choose the app mode',
-                                    ['About Project', 'Real-time assistance', 'Upload video'])
+    st.sidebar.write(
+        ' AI-FitTrainer is an innovative AI-powered solution designed to help you improve your squat technique and '
+        'achieve your fitness goals.')
+    app_mode = st.sidebar.selectbox('Choose the app mode', ['About Project', 'Assist My Squat'])
 
     if app_mode == 'About Project':
         show_about_project_ui()
-    elif app_mode == "Real-time assistance":
-        show_realtime_assistance_ui()
-    elif app_mode == "Upload video":
-        show_upload_ui()
+
+    elif app_mode == "Assist My Squat":
+        show_assist_squat_ui()
 
 
 if __name__ == "__main__":
