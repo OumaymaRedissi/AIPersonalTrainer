@@ -9,8 +9,8 @@ from backend.model_inference import load_lstm_model, load_features_extractor, lo
 IMG_SIZE = 380
 SEQUENCE_LENGTH = 40
 CLASSES_LIST = ['good', 'bad_inner_thigh', 'bad_toe', 'bad_shallow', 'bad_back_round', 'bad_back_warp', 'bad_head']
-LSTM_PATH = ('inference_models/LSTM_model___Date_Time_2023_07_14__11_23_24___Loss_0.15005652606487274___Accuracy_0'
-             '.9453616142272949.h5')
+LSTM_PATH = ('inference_models\LSTM_model___Date_Time_2023_09_09__19_04___Loss_0.27015820145606995___Accuracy_0'
+             '.9068396091461182.h5')
 
 
 def show_about_project_ui():
@@ -19,9 +19,9 @@ def show_about_project_ui():
     st.write('Welcome to AI-FitTrainer, your innovative AI-powered solution designed to help you improve your squat '
              'technique and achieve your fitness goals.')
     st.write('With AI-FitTrainer, you can:')
-    _,col,_= st.columns([0.15, 0.7, 0.15])
+    _, col, _ = st.columns([0.15, 0.7, 0.15])
     with col:
-        st.image("img/features.png",use_column_width=True)
+        st.image("img/features.png", use_column_width=True)
 
     st.write('Whether you are looking to master the basics of squats or refine your form, AI-FitTrainer is here to '
              'support you throughout your fitness journey.')
@@ -56,7 +56,7 @@ def show_assist_squat_ui():
         unsafe_allow_html=True,
     )
 
-    st.markdown('# Assist My Squat ! ',)
+    st.markdown('# Assist My Squat ! ', )
     st.markdown(
         '<p class="subheader-text">Ready to improve your squat technique? Upload a video of your squat performance '
         'and get personalized feedback.</p>',

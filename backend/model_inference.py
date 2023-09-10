@@ -1,13 +1,11 @@
 import os
 import tensorflow as tf
-from tensorflow_addons.metrics import MultiLabelConfusionMatrix
 from langchain.llms import OpenAI
 from dotenv import load_dotenv
 
 
 def load_lstm_model(model_path):
-    model_lstm = tf.keras.models.load_model(model_path,
-                                            custom_objects={'MultiLabelConfusionMatrix': MultiLabelConfusionMatrix})
+    model_lstm = tf.keras.models.load_model(model_path)
     return model_lstm
 
 
@@ -23,7 +21,7 @@ def load_features_extractor(img_size):
 
 def load_llm():
     load_dotenv()  # Load environment variables from .env file
-    openai_api_key = os.environ.get("OPENAI_API_KEY")
+    openai_api_key = os.getenv('OPENAI_API_KEY')
     if not openai_api_key:
         raise ValueError("OpenAI API key not found in environment variables.")
     llm = OpenAI(openai_api_key=openai_api_key, temperature=0.2)
